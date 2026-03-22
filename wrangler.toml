@@ -1,0 +1,8 @@
+name = "freelanceos"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "freelanceos-db"
+database_id = "88f37663-a4a2-401e-973e-57ee9c724420"

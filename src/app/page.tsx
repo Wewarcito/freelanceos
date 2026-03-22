@@ -20,14 +20,14 @@ export default function Home() {
             <span className="font-bold text-xl">freelanceos</span>
           </div>
           <nav className="flex items-center gap-4">
-            <Link
-              href="/sign-in"
+              <Link
+              href="/auth/sign-in"
               className="text-sm font-medium hover:text-blue-600 transition"
             >
               Iniciar sesión
             </Link>
             <Link
-              href="/sign-up"
+              href="/auth/sign-up"
               className="text-sm font-medium bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Comenzar gratis
@@ -53,7 +53,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/sign-up"
+              href="/auth/sign-up"
               className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-lg font-medium text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/30"
             >
               Empezar ahora - Es gratis
@@ -122,7 +122,7 @@ export default function Home() {
             Únete a otros freelancers que ya usan freelanceos para gestionar su negocio.
           </p>
           <Link
-            href="/sign-up"
+            href="/auth/sign-up"
             className="inline-flex items-center justify-center bg-white text-blue-600 px-8 py-4 rounded-lg font-medium text-lg hover:bg-blue-50 transition"
           >
             Crear cuenta gratis

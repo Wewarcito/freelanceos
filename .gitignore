@@ -52,3 +52,5 @@ drizzle/migrations/
 # Database
 *.db
 *.db-journal
+
+.vercel
