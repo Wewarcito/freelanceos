@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
 import { invoices } from "@/drizzle/schema";
+import { db } from "@/lib/db";
 
 export const runtime = 'edge';
 
@@ -17,8 +17,6 @@ export async function GET(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const db = drizzle({} as any);
     
     const invoice = await db
       .select()
@@ -52,8 +50,6 @@ export async function PUT(
     const body = await request.json();
     const { invoiceNumber, status, amount, dueDate, paidDate, projectId, items } = body;
 
-    const db = drizzle({} as any);
-    
     const updateData: any = {
       updatedAt: new Date(),
     };
@@ -101,8 +97,6 @@ export async function DELETE(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const db = drizzle({} as any);
     
     await db
       .delete(invoices)

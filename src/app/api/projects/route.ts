@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
 import { projects, clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
+import { db } from "@/lib/db";
 
 export const runtime = 'edge';
 
@@ -15,8 +15,6 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const db = drizzle({} as any);
-    
     const allProjects = await db
       .select({
         id: projects.id,
@@ -57,8 +55,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const db = drizzle({} as any);
-    
     const newProject = {
       id: nanoid(),
       userId,

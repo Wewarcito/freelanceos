@@ -1,19 +1,10 @@
-import { drizzle } from "drizzle-orm/d1";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "@/drizzle/schema";
 
-type D1Database = {
-  prepare: (sql: string) => {
-    bind: (...args: unknown[]) => {
-      first: <T>() => Promise<T | null>;
-      all: <T>() => Promise<{ results: T[] }>;
-      run: () => Promise<void>;
-    };
-  };
-  exec: (sql: string) => Promise<void>;
-};
+const connectionString = process.env.DATABASE_URL!;
 
-export function createDb(d1: D1Database) {
-  return drizzle(d1, { schema });
-}
+const client = postgres(connectionString, { prepare: false });
+export const db = drizzle(client, { schema });
 
-export type Database = ReturnType<typeof createDb>;
+export type Database = typeof db;

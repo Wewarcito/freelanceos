@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
 import { clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
+import { db } from "@/lib/db";
 
 export const runtime = 'edge';
 
@@ -15,10 +15,6 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Para desarrollo, usamos SQLite local
-    // En producción usarías D1 con: drizzle(env.D1Database, { schema })
-    const db = drizzle({} as any);
-    
     const allClients = await db
       .select()
       .from(clients)
@@ -46,8 +42,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const db = drizzle({} as any);
-    
     const newClient = {
       id: nanoid(),
       userId,

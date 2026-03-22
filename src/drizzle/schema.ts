@@ -1,19 +1,19 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, text, timestamp, real } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").unique().notNull(),
   name: text("name"),
   avatar: text("avatar"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 
-export const supporters = sqliteTable("supporters", {
+export const supporters = pgTable("supporters", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .references(() => users.id)
@@ -22,17 +22,17 @@ export const supporters = sqliteTable("supporters", {
   kofiLink: text("kofi_link"),
   tier: text("tier").default("coffee"),
   totalDonated: real("total_donated").default(0),
-  isVerified: integer("is_verified", { mode: "boolean" }).default(false),
-  verifiedAt: integer("verified_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  isVerified: text("is_verified").default("false"),
+  verifiedAt: timestamp("verified_at", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 
-export const clients = sqliteTable("clients", {
+export const clients = pgTable("clients", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .references(() => users.id)
@@ -43,15 +43,15 @@ export const clients = sqliteTable("clients", {
   company: text("company"),
   address: text("address"),
   notes: text("notes"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 
-export const projects = sqliteTable("projects", {
+export const projects = pgTable("projects", {
   id: text("id").primaryKey(),
   clientId: text("client_id").references(() => clients.id),
   userId: text("user_id")
@@ -61,35 +61,35 @@ export const projects = sqliteTable("projects", {
   description: text("description"),
   status: text("status").default("potential"),
   budget: real("budget"),
-  deadline: integer("deadline", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  deadline: timestamp("deadline", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 
-export const timeEntries = sqliteTable("time_entries", {
+export const timeEntries = pgTable("time_entries", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .references(() => users.id)
     .notNull(),
   projectId: text("project_id").references(() => projects.id),
-  startTime: integer("start_time", { mode: "timestamp" }).notNull(),
-  endTime: integer("end_time", { mode: "timestamp" }),
-  duration: integer("duration"),
+  startTime: timestamp("start_time", { mode: "date" }).notNull(),
+  endTime: timestamp("end_time", { mode: "date" }),
+  duration: text("duration"),
   description: text("description"),
-  billable: integer("billable", { mode: "boolean" }).default(true),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  billable: text("billable").default("true"),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 
-export const invoices = sqliteTable("invoices", {
+export const invoices = pgTable("invoices", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .references(() => users.id)
@@ -98,15 +98,15 @@ export const invoices = sqliteTable("invoices", {
   invoiceNumber: text("invoice_number").unique().notNull(),
   status: text("status").default("draft"),
   amount: real("amount").notNull(),
-  dueDate: integer("due_date", { mode: "timestamp" }).notNull(),
-  paidDate: integer("paid_date", { mode: "timestamp" }),
+  dueDate: timestamp("due_date", { mode: "date" }).notNull(),
+  paidDate: timestamp("paid_date", { mode: "date" }),
   items: text("items"),
   pdfUrl: text("pdf_url"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
     .notNull(),
 });
 

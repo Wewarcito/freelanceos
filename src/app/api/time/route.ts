@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { drizzle } from "drizzle-orm/d1";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { timeEntries, projects, clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
+import { db } from "@/lib/db";
 
 export const runtime = 'edge';
 
@@ -15,14 +15,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get("projectId");
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-
-    const db = drizzle({} as any);
-    
-    let query = db
+    const entries = await db
       .select({
         id: timeEntries.id,
         description: timeEntries.description,
@@ -42,8 +35,6 @@ export async function GET(request: NextRequest) {
       .leftJoin(clients, eq(projects.clientId, clients.id))
       .where(eq(timeEntries.userId, userId))
       .orderBy(desc(timeEntries.startTime));
-
-    const entries = await query;
 
     return NextResponse.json(entries);
   } catch (error) {
@@ -67,8 +58,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Start time is required" }, { status: 400 });
     }
 
-    const db = drizzle({} as any);
-    
     const newEntry = {
       id: nanoid(),
       userId,
@@ -76,8 +65,8 @@ export async function POST(request: NextRequest) {
       description: description || null,
       startTime: new Date(startTime),
       endTime: endTime ? new Date(endTime) : null,
-      duration: duration ? parseInt(duration) : null,
-      billable: billable !== false,
+      duration: duration ? String(duration) : null,
+      billable: billable !== false ? "true" : "false",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
