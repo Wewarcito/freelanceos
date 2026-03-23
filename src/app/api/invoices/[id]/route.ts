@@ -1,27 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 import { invoices } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     const invoice = await db
       .select()
       .from(invoices)
-      .where(and(eq(invoices.id, id), eq(invoices.userId, userId)))
+      .where(and(eq(invoices.id, id), eq(invoices.userId, session.user.id)))
       .limit(1);
 
     if (invoice.length === 0) {
@@ -40,10 +38,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -71,7 +69,7 @@ export async function PUT(
     await db
       .update(invoices)
       .set(updateData)
-      .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+      .where(and(eq(invoices.id, id), eq(invoices.userId, session.user.id)));
 
     const updated = await db
       .select()
@@ -91,16 +89,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     await db
       .delete(invoices)
-      .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+      .where(and(eq(invoices.id, id), eq(invoices.userId, session.user.id)));
 
     return NextResponse.json({ success: true });
   } catch (error) {

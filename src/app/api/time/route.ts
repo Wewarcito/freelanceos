@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq, desc } from "drizzle-orm";
 import { timeEntries, projects, clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
       .from(timeEntries)
       .leftJoin(projects, eq(timeEntries.projectId, projects.id))
       .leftJoin(clients, eq(projects.clientId, clients.id))
-      .where(eq(timeEntries.userId, userId))
+      .where(eq(timeEntries.userId, session.user.id))
       .orderBy(desc(timeEntries.startTime));
 
     return NextResponse.json(entries);
@@ -45,9 +43,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -60,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const newEntry = {
       id: nanoid(),
-      userId,
+      userId: session.user.id,
       projectId: projectId || null,
       description: description || null,
       startTime: new Date(startTime),

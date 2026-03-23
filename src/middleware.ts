@@ -1,10 +1,18 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+export default auth((req) => {
+  if (!req.auth) {
+    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+  }
+});
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
+    "/dashboard/:path*",
+    "/api/clients/:path*",
+    "/api/projects/:path*",
+    "/api/invoices/:path*",
+    "/api/time/:path*",
   ],
 };

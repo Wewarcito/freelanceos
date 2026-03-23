@@ -1,27 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 import { timeEntries } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     const entry = await db
       .select()
       .from(timeEntries)
-      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, userId)))
+      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, session.user.id)))
       .limit(1);
 
     if (entry.length === 0) {
@@ -40,10 +38,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -61,7 +59,7 @@ export async function PUT(
         projectId: projectId || null,
         updatedAt: new Date(),
       })
-      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, userId)));
+      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, session.user.id)));
 
     const updated = await db
       .select()
@@ -81,16 +79,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     await db
       .delete(timeEntries)
-      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, userId)));
+      .where(and(eq(timeEntries.id, id), eq(timeEntries.userId, session.user.id)));
 
     return NextResponse.json({ success: true });
   } catch (error) {

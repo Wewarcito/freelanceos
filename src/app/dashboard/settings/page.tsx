@@ -45,7 +45,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center gap-4">
             <p className="text-gray-500 text-sm flex-1">
-              Gestiona tu perfil desde Clerk. Los cambios se reflejarán automáticamente.
+              Gestiona tu perfil desde la configuración de tu cuenta. Los cambios se reflejarán automáticamente.
             </p>
             {isSupporter && (
               <SupporterBadge tier={supporterTier as any} size="md" />
@@ -198,7 +198,7 @@ export default function SettingsPage() {
             </div>
           </div>
           <p className="text-gray-500 text-sm">
-            La seguridad de tu cuenta es gestionada por Clerk.
+            La seguridad de tu cuenta es gestionada a través de Auth.js.
           </p>
         </div>
       </div>

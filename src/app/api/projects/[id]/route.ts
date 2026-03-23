@@ -1,27 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 import { projects } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     const project = await db
       .select()
       .from(projects)
-      .where(and(eq(projects.id, id), eq(projects.userId, userId)))
+      .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)))
       .limit(1);
 
     if (project.length === 0) {
@@ -40,10 +38,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -61,7 +59,7 @@ export async function PUT(
         clientId: clientId || null,
         updatedAt: new Date(),
       })
-      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
+      .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)));
 
     const updated = await db
       .select()
@@ -81,16 +79,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     const { id } = await params;
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     await db
       .delete(projects)
-      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
+      .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)));
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -4,12 +4,9 @@
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZW5kbGVzcy1tb29zZS00MC5jbGVyay5hY2NvdW50cy5kZXYk",
-    "CLERK_SECRET_KEY": "sk_test_6ReL0zHcynrYUQ39LbFYUUuJLKVGI6UyAGOeAGJZ25",
-    "NEXT_PUBLIC_CLERK_SIGN_IN_URL": "https://freelanceos-vert.vercel.app/auth/sign-in",
-    "NEXT_PUBLIC_CLERK_SIGN_UP_URL": "https://freelanceos-vert.vercel.app/auth/sign-up",
-    "NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL": "https://freelanceos-vert.vercel.app/dashboard",
-    "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL": "https://freelanceos-vert.vercel.app/dashboard",
+    "AUTH_SECRET": "supersecretkey123456789",
+    "AUTH_GOOGLE_ID": "",
+    "AUTH_GOOGLE_SECRET": "",
     "NEXT_PUBLIC_KOFI_USERNAME": "webwardlabs",
     "NEXT_PUBLIC_APP_URL": "https://freelanceos-vert.vercel.app"
   }

@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -9,10 +8,13 @@ import {
   FileText,
   Settings,
   Heart,
+  LogOut,
 } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
+import { signOut } from "next-auth/react";
 import ThankYouModal from "@/components/thank-you-modal";
 import ToastProvider from "@/components/toast-provider";
+import UserMenu from "@/components/user-menu";
+import { auth } from "@/lib/auth";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,13 +30,11 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = await auth();
+  const session = await auth();
 
-  if (!userId) {
-    redirect("/sign-in");
+  if (!session) {
+    redirect("/auth/sign-in");
   }
-
-  const user = await currentUser();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,7 +60,7 @@ export default async function DashboardLayout({
               <Heart className="w-4 h-4" />
               <span className="hidden sm:inline">Donar</span>
             </a>
-            <UserButton />
+            <UserMenu user={session.user} />
           </div>
         </div>
       </header>
@@ -81,10 +81,14 @@ export default async function DashboardLayout({
             ))}
           </nav>
 
-          <div className="p-4 border-t">
-            <p className="text-xs text-gray-500 text-center">
-              {user?.firstName || "Usuario"}
-            </p>
+          <div className="p-4 border-t space-y-2">
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition w-full"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Cerrar sesión</span>
+            </button>
           </div>
         </aside>
 

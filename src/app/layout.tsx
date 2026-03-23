@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_CO",
-    url: "https://freelanceos.pages.dev",
+    url: "https://freelanceos-vert.vercel.app",
     siteName: "freelanceos",
     title: "freelanceos - Gestión para freelancers",
     description: "Gestiona clientes, proyectos, tiempo y facturas en un solo lugar. 100% gratuito.",
@@ -47,12 +47,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="es">
-        <body className="antialiased">
+    <html lang="es">
+      <body className="antialiased">
+        <Providers>
           {children}
-        </body>
-      </html>
-    </ClerkProvider>
+        </Providers>
+      </body>
+    </html>
   );
 }

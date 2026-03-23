@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq, desc } from "drizzle-orm";
 import { invoices, projects, clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -33,7 +31,7 @@ export async function GET() {
       .from(invoices)
       .leftJoin(projects, eq(invoices.projectId, projects.id))
       .leftJoin(clients, eq(projects.clientId, clients.id))
-      .where(eq(invoices.userId, userId))
+      .where(eq(invoices.userId, session.user.id))
       .orderBy(desc(invoices.createdAt));
 
     return NextResponse.json(allInvoices);
@@ -45,9 +43,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -60,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const newInvoice = {
       id: nanoid(),
-      userId,
+      userId: session.user.id,
       projectId: projectId || null,
       invoiceNumber,
       status: status || "draft",

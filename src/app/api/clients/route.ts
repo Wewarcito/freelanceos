@@ -1,24 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { clients } from "@/drizzle/schema";
 import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
-
-export const runtime = 'edge';
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const allClients = await db
       .select()
       .from(clients)
-      .where(eq(clients.userId, userId));
+      .where(eq(clients.userId, session.user.id));
 
     return NextResponse.json(allClients);
   } catch (error) {
@@ -29,9 +27,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -44,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const newClient = {
       id: nanoid(),
-      userId,
+      userId: session.user.id,
       name,
       email: email || null,
       phone: phone || null,
