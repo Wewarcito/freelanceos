@@ -26,7 +26,6 @@ export const authAccounts = pgTable("auth_accounts", {
 });
 
 export const authSessions = pgTable("auth_sessions", {
-  id: text("id").primaryKey(),
   sessionToken: varchar("session_token", { length: 255 }).primaryKey().notNull(),
   userId: text("user_id").notNull().references(() => authUsers.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
